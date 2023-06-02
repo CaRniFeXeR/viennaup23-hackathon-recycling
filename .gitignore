@@ -1,3 +1,7 @@
+# Marvin
+backend/region_proposal/public_dataset/*
+backend/region_proposal/sustainibility-hackathon/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
