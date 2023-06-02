@@ -8,6 +8,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@canvasjs/vue-charts": "^1.0.1",
+    "chart.js": "^4.3.0",
     "vue": "^3.3.2"
   },
   "devDependencies": {
