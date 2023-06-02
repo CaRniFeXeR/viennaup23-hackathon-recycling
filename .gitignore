@@ -197,3 +197,5 @@ coverage
 *.njsproj
 *.sln
 *.sw?
+/images/
+/data/
