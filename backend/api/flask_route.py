@@ -1,4 +1,5 @@
-from flask import Flask, jsonify, send_file
+from flask import Flask, jsonify, send_file, send_from_directory
+import flask
 
 app = Flask(__name__)
 
@@ -36,6 +37,16 @@ def get_image(img_path):
     # For the purpose of this example, we will return a placeholder image.
     placeholder_image_path = 'placeholder.jpg'
     return send_file(placeholder_image_path, mimetype='image/jpeg')
+
+@app.route("/static_content/<path:filename>")
+def return_js(filename: str):
+    # return flask.send_file("./../../frontend/map/cluster_map.js")
+    return send_from_directory("./../../frontend/map", filename)
+
+@app.route("/")
+def index():
+    """Displays the index page accessible at '/'"""
+    return flask.send_file("./../../frontend/map/index.html")
 
 if __name__ == '__main__':
     app.run()
