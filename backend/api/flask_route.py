@@ -40,7 +40,6 @@ def get_image(img_path):
 
 @app.route("/static_content/<path:filename>")
 def return_js(filename: str):
-    # return flask.send_file("./../../frontend/map/cluster_map.js")
     return send_from_directory("./../../frontend/map", filename)
 
 @app.route("/")
