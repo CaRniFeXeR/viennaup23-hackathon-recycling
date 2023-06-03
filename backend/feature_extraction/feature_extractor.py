@@ -31,7 +31,7 @@ class FeatureExtractor(nn.Module):
         :param device:
         """
         super().__init__()
-        self.pca = decomposition.PCA(n_components=2)
+        self.pca = decomposition.PCA(n_components=64)
         self.hdbscan = hdbscan.HDBSCAN(min_cluster_size=3, gen_min_span_tree=True)
         self.device = device
         self.resize = transforms.Resize(size=(256, 256), interpolation=transforms.InterpolationMode.NEAREST)
@@ -82,16 +82,15 @@ class FeatureExtractor(nn.Module):
         return self._extract_features(x)
 
     @torch.inference_mode()
-    def forward_project_pca(self, x: torch.Tensor) -> np.ndarray:
-        z = self.m(x).numpy()
-        self.pca.fit(z)
-        y = self.pca.transform(z)
+    def pca_project(self, x: torch.Tensor) -> np.ndarray:
+        self.pca.fit(x)
+        y = self.pca.transform(x)
         return y
 
 
 def get_feature_extractor(img_path: Optional[Union[str, os.PathLike]] = None,
                           device: Optional[str] = None,
-                          extractor_name: str = 'convnext_base.clip_laion2b') -> FeatureExtractor:
+                          extractor_name: str = 'convnext_small.fb_in22k') -> FeatureExtractor:
     extractor = timm.create_model(model_name=extractor_name, pretrained=True, num_classes=0)
     device = device or 'cuda' if torch.cuda.is_available() else 'cpu'
     return FeatureExtractor(img_path=img_path,
@@ -101,13 +100,16 @@ def get_feature_extractor(img_path: Optional[Union[str, os.PathLike]] = None,
 
 if __name__ == '__main__':
 # one npy file per feature
-    img_path = os.environ.get('INPUT_PATH', 'viennaup23-hackathon-recycling/backend/data/images')
-    feature_path = Path(os.environ.get('OUTPUT_PATH', 'viennaup23-hackathon-recycling/backend/data/features'))
+    img_path = os.environ.get('INPUT_PATH', '/home/alireza/repositories/viennaup23-hackathon-recycling/backend/data/images')
+    feature_path = Path(os.environ.get('OUTPUT_PATH', '/home/alireza/repositories/viennaup23-hackathon-recycling/backend/data/features_noclip64'))
+    pca_proj = bool(os.environ.get('PCA_PROJ', False))
     mkdir(feature_path)
     file_list = glob.glob(f'{img_path}/*.*')
     file_list.sort()
     m = get_feature_extractor(img_path=img_path)
     features = m.extract()
+    if pca_proj:
+        features = m.pca_project(features)
     for idx, feature_vec in enumerate(features):
         np.save(feature_path / Path(file_list[idx]).stem, feature_vec)
 
