@@ -2,6 +2,23 @@ from flask import Flask, jsonify, send_file, send_from_directory, request
 from PIL import Image
 import flask
 import os
+import json
+from pathlib import Path
+
+def load_data_from_jsons(folder : Path):
+
+    dict = {}
+
+    class_id_to_label = {0: "can", 1 : "bottle",2: "glas"}
+
+    for file in folder.iterdir():
+        if file.name.startswith("pred_after_"):
+            #load file as json
+            json_data = json.load(file)
+            dict[json_data["name"]] = [json_data["features"][0],json_data["features"][1], class_id_to_label[json_data["class_id"]]]
+
+    return dict
+
 
 app = Flask(__name__)
 
