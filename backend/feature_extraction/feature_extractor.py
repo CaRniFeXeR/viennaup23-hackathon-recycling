@@ -11,6 +11,7 @@ from torch import nn
 from sklearn import decomposition
 from torchvision import transforms
 
+
 def mkdir(dir_path):
     Path(dir_path).mkdir(parents=True, exist_ok=True)
 
@@ -19,7 +20,10 @@ class FeatureExtractor(nn.Module):
     """
         Composable Feature Extractor
     """
-    def __init__(self, img_path: Optional[Union[str, os.PathLike]], extractor: nn.Module, device: str = 'cpu'):
+
+    def __init__(self,
+                 img_path: Optional[Union[str, os.PathLike]],
+                 extractor: nn.Module, device: str = 'cpu'):
         """
 
         :param img_path: Directory of Images or Path to Image. Loads entire batch into memory if passed
@@ -46,6 +50,7 @@ class FeatureExtractor(nn.Module):
         else:
             # arr = np.array([np.array(self.resize(Image.open(img_path)))])
             self.imgs = [self.to_tensor(Image.open(img_path)).unsqueeze(dim=0)]
+
         # self.imgs = torch.tensor(np.transpose(arr, (0, 3, 1, 2)))
 
     def _extract_features_preloaded(self) -> torch.tensor:
@@ -62,7 +67,11 @@ class FeatureExtractor(nn.Module):
         return self.extractor.head.global_pool(self.extractor.forward_features(x))
 
     @torch.inference_mode()
-    def forward(self, x: Optional[torch.Tensor] = None) -> torch.Tensor:
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.extract(x)
+
+    @torch.inference_mode()
+    def extract(self, x: Optional[torch.Tensor] = None) -> torch.Tensor:
         """
         :param x: Optional image tensor to extract features from. If None, extracts feature from preloaded images
         :return:
@@ -86,5 +95,21 @@ def get_feature_extractor(img_path: Optional[Union[str, os.PathLike]] = None,
     extractor = timm.create_model(model_name=extractor_name, pretrained=True, num_classes=0)
     device = device or 'cuda' if torch.cuda.is_available() else 'cpu'
     return FeatureExtractor(img_path=img_path,
-                            extractor= extractor,
+                            extractor=extractor,
                             device=device)
+
+
+if __name__ == '__main__':
+# one npy file per feature
+    img_path = os.environ.get('INPUT_PATH', 'viennaup23-hackathon-recycling/backend/data/images')
+    feature_path = Path(os.environ.get('OUTPUT_PATH', 'viennaup23-hackathon-recycling/backend/data/features'))
+    mkdir(feature_path)
+    file_list = glob.glob(f'{img_path}/*.*')
+    file_list.sort()
+    m = get_feature_extractor(img_path=img_path)
+    features = m.extract()
+    for idx, feature_vec in enumerate(features):
+        np.save(feature_path / Path(file_list[idx]).stem, feature_vec)
+
+
+
