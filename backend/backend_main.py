@@ -17,21 +17,21 @@ if __name__ == '__main__':
     device = torch.device(args.device)
 
     # check that output_path does not exist and create it
-    if Path(args.output_path).exists():
-        print('## Output path already exists ##')
-        exit
-    else:
-        Path(args.output_path).mkdir(parents=True, exist_ok=False)
+    assert not Path(args.output_path).exists(), 'Output path already exists'
+    Path(args.output_path).mkdir(parents=True, exist_ok=False)
 
     print('## Extracting bounding boxes ##')
     object_detector = BoundingBoxExtractor(device)
     boxes = object_detector.extract_bounding_boxes(args.image_path, args.output_path, save=True)
 
     print('## Extracting features ##')
-    feature_extractor = get_feature_extractor()
+    feature_extractor = get_feature_extractor(device=device)
     feature_extractor = feature_extractor.to(device)
 
     to_tensor = ToTensor()
     for i, box in enumerate(boxes):
         box_t = to_tensor(box).unsqueeze(0).to(device)
-        features = feature_extractor(box_t).cpu().detach().numpy()
+        features = feature_extractor(box_t).cpu().detach().numpy()[:, :, 0, 0]
+
+
+    print('test')
