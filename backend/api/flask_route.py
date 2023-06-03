@@ -39,7 +39,7 @@ def get_latest_scans(n):
     if n <= 0:
         return jsonify({'error': 'Invalid value for n. Must be a positive integer.'}), 400
 
-    TargetArr = []
+    returnArr = []
 
     counter = 0
     # for obj in objects_array:
@@ -68,9 +68,9 @@ def get_latest_scans(n):
         }
         counter += 1
 
-        TargetArr.append(target_obj)
+        returnArr.append(target_obj)
 
-    return jsonify({'scanned_objects': TargetArr})
+    return jsonify({'scanned_objects': returnArr})
 
 
 
