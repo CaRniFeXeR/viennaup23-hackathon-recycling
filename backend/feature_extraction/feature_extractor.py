@@ -17,10 +17,15 @@ def mkdir(dir_path):
 
 class FeatureExtractor(nn.Module):
     """
-        Initial Feature Extractor
+        Composable Feature Extractor
     """
-
     def __init__(self, img_path: Optional[Union[str, os.PathLike]], extractor: nn.Module, device: str = 'cpu'):
+        """
+
+        :param img_path: Directory of Images or Path to Image. Loads entire batch into memory if passed
+        :param extractor: torch module with pretrained weights to extract features from image datg
+        :param device:
+        """
         super().__init__()
         self.pca = decomposition.PCA(n_components=2)
         self.hdbscan = hdbscan.HDBSCAN(min_cluster_size=3, gen_min_span_tree=True)
@@ -47,7 +52,12 @@ class FeatureExtractor(nn.Module):
         x = x.to(self.device)
         return self.extractor.forward_features(x)
 
+    @torch.inference_mode()
     def forward(self, x: Optional[torch.Tensor] = None) -> torch.Tensor:
+        """
+        :param x: Optional image tensor to extract features from. If None, extracts feature from preloaded images
+        :return:
+        """
         if x is None:
             assert self.imgs, "Preload images or pass torch tensor"
             return self.m._extract_features_preloaded(x)
@@ -69,4 +79,3 @@ def get_feature_extractor(img_path: Optional[Union[str, os.PathLike]] = None,
     return FeatureExtractor(img_path=img_path,
                             extractor= extractor,
                             device=device)
-
