@@ -1,7 +1,7 @@
 import glob
 import os
 from pathlib import Path
-from typing import Optional, Union
+from typing import List, Optional, Union
 from PIL import Image
 import timm
 import torch
@@ -31,6 +31,7 @@ class FeatureExtractor(nn.Module):
         :param device:
         """
         super().__init__()
+        self.extractor = extractor.to(device)
         self.pca = decomposition.PCA(n_components=64)
         self.hdbscan = hdbscan.HDBSCAN(min_cluster_size=3, gen_min_span_tree=True)
         self.device = device
@@ -38,9 +39,9 @@ class FeatureExtractor(nn.Module):
         self.to_tensor = transforms.ToTensor()
         if img_path:
             self.load_imgs(img_path)
+            self._fit_pca()
         else:
             self.imgs = None
-        self.extractor = extractor.to(device)
 
     def load_imgs(self, img_path: Union[str, os.PathLike]):
         if os.path.isdir(img_path):
@@ -52,6 +53,14 @@ class FeatureExtractor(nn.Module):
             self.imgs = [self.to_tensor(Image.open(img_path)).unsqueeze(dim=0)]
 
         # self.imgs = torch.tensor(np.transpose(arr, (0, 3, 1, 2)))
+
+    def _fit_pca(self, imgs: Optional[torch.Tensor] = None):
+        if imgs:
+            imgs = imgs.numpy()
+            self.pca.fit(imgs)
+        else:
+            f = self._extract_features_preloaded()
+            self.pca.fit(f)
 
     def _extract_features_preloaded(self) -> torch.tensor:
         features = []
@@ -83,7 +92,6 @@ class FeatureExtractor(nn.Module):
 
     @torch.inference_mode()
     def pca_project(self, x: torch.Tensor) -> np.ndarray:
-        self.pca.fit(x)
         y = self.pca.transform(x)
         return y
 
