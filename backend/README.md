@@ -10,3 +10,7 @@ The result of the pipeline will be returned as a dictionary of image_path : feat
         ...
     }
 ```
+
+### Classifier input format
+
+The result of the feature extraction should return a feature vector for every cropped image. For training we give Marvin a list of feautures together with class labels ('pet', 'can', 'glass').
