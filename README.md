@@ -14,7 +14,9 @@ The users are presented with suggested labels, and are informed when the confide
 
 In a sense, the pipeline becomes a domain-adaptive online learner but has a solid foundation with powerful and efficient (subsecond inference times on server-grade hardware) models. The pre-trained models do not need to be finetuned at any point.
 
+Example of the embedding space after the final MLP prediction:
 
+### ![embeddings](figures/embeddings.png)
 
 ## TechStack (All open source)
 
