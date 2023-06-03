@@ -59,11 +59,12 @@ map.on('zoomend', function() {
 });
 
 function getPopupContent(scan_obj) {
+    var predicted_class = scan_obj.predicted_class !== null ? scan_obj.predicted_class : "";
     var popupContent = `
     <div class="custom-popup" id="obj_${scan_obj.id}">
         <img src="${scan_obj.img_url}" alt="Image" style="max-width: 100%; max-height: 100%;">
-        <p>the object is labeled as <b>${scan_obj.predicted_class}</b></p>
-        <input type="text" placeholder="type a new label" value="${scan_obj.predicted_class}">
+        <p>the object is labeled as <b>${predicted_class}</b></p>
+        <input type="text" placeholder="type a new label" value="${predicted_class}">
         <button onclick="submitForm(${scan_obj.id})">Save</button>
     </div>
     `;
@@ -92,6 +93,8 @@ function submitForm(id) {
     objs[id].predicted_class = userInput;
 
     objs[id].marker.getPopup().setContent(getPopupContent(objs[id]));
+
+    //Do backend call which id and which label got set
 }
 
 function getLatestScans(n) {

@@ -5,25 +5,9 @@ import os
 
 app = Flask(__name__)
 
-# Mock data for scanned objects
-# scanned_objects = [
-#     {
-#         'embedding_vec': [0.1, 0.2, 0.3],
-#         'point': [10, 20],
-#         'img_url': 'https://example.com/image1.jpg',
-#         'predicted_class': 'cat'
-#     },
-#     {
-#         'embedding_vec': [0.4, 0.5, 0.6],
-#         'point': [30, 40],
-#         'img_url': 'https://example.com/image2.jpg',
-#         'predicted_class': 'dog'
-#     },
-#     # Add more scanned objects as needed
-# ]
 
 example_data = {
-        "img0_0.png": [0.23939520415773685, 0.39729491531822647],
+        "img0_0.png": [0.23939520415773685, 0.39729491531822647, "example_class"],
         "img0_1.png": [80.7109474876517918, 1.5464037739352541],
         "img0_2.png": [2.4823443230341764, 90.1366062742947145],
         "img0_3.png": [3.8467880824049828, 3.7541917936743278],
@@ -53,7 +37,7 @@ def get_latest_scans(n):
             break
         
         counter += 1
-        x, y = point
+        x, y = point[:2]
         img_url = "./static_content/scan_img/" + img_name
         img_size = [0, 0]
         script_dir = os.path.dirname(__file__)
@@ -65,13 +49,15 @@ def get_latest_scans(n):
                 img_size = img.size
         except IOError:
             continue
-
+        
+        predicted_class = point[2] if len(point) > 2 and point[2] else None
 
         target_obj = {
             'id': counter,
             'point': [x, y],
             'img_url': img_url,
-            'img_size': img_size
+            'img_size': img_size,
+            'predicted_class': predicted_class
         }
 
         TargetArr.append(target_obj)
