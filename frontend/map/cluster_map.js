@@ -3,13 +3,13 @@ console.log("cluster_map.js")
 // Initialize the map
 // var map = L.map('map').setView([51.505, -0.09], 13);
 
-function getIcon(url, size) {
+function genIcon(url, size, view_factor = 1.0) {
 
     scale_factor = 0.2;
     var bottleIcon = L.icon({
         iconUrl: url,
-        iconSize: [size[0] * scale_factor, size[1] * scale_factor], // size of the icon
-        init_iconSize: [size[0] * scale_factor, size[1] * scale_factor], // size of the icon
+        iconSize: [size[0] * scale_factor * view_factor, size[1] * scale_factor * view_factor], // size of the icon
+        init_iconSize: [size[0], size[1]], // size of the icon
         // shadowSize:   [50, 64], // size of the shadow
         // iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
         // shadowAnchor: [4, 62]  // the same for the shadow
@@ -46,14 +46,12 @@ map.on('zoomend', function() {
 
         if (currentZoom < 0) {
             factor = 10 / (10 + currentZoom);
-            iconSize = [iconSize[0] * factor, iconSize[1] * factor];
         } else if (currentZoom > 0) {
             factor = 10 / (10 + currentZoom);
-            iconSize = [iconSize[0] * factor, iconSize[1] * factor];
         }
 
         // Update the icon size of the marker
-        marker.setIcon(getIcon(scan_obj.img_url, iconSize));
+        marker.setIcon(genIcon(scan_obj.img_url, iconSize, factor));
     });
 
 
@@ -78,7 +76,7 @@ function addPoint(scan_obj) {
     var popupContent = getPopupContent(scan_obj);
 
     var sol = L.latLng(scan_obj.point);
-    var marker = L.marker(sol, { icon: getIcon(scan_obj.img_url, scan_obj.img_size) }).addTo(map).bindPopup(popupContent);
+    var marker = L.marker(sol, { icon: genIcon(scan_obj.img_url, scan_obj.img_size, 1.0) }).addTo(map).bindPopup(popupContent);
     map.setView([70, 120], 1);
     scan_obj.marker = marker;
     objs.push(scan_obj);
