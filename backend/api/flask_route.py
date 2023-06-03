@@ -54,7 +54,7 @@ def get_latest_scans(n):
         
         counter += 1
         x, y = point
-        img_url = "./static_content/" + img_name
+        img_url = "./static_content/scan_img/" + img_name
         img_size = [0, 0]
         script_dir = os.path.dirname(__file__)
         #parent_dir = os.path.abspath(os.path.join(script_dir, os.pardir))

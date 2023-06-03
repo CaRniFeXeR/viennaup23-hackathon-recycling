@@ -199,3 +199,5 @@ coverage
 *.sw?
 /images/
 /data/
+
+/frontend/map/scan_img/
