@@ -48,7 +48,7 @@ def get_latest_scans(n):
         img_url = "./static_content/scan_img/" + objects_array[counter]['img_name']
         img_size = [0, 0]
         script_dir = os.path.dirname(__file__)
-        file_path = os.path.join(script_dir, "..", "segmentation", "samples", objects_array[counter]['img_name'])
+        file_path = os.path.join(script_dir, "..", "data", "images", objects_array[counter]['img_name'])
 
         try:
             with Image.open(file_path) as img:
