@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-os.environ["CUDA_VISIBLE_DEVICES"]="0"
+os.environ["CUDA_VISIBLE_DEVICES"]="1"
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -123,8 +123,15 @@ def get_features():
         # print("embeddings_nms", embeddings_nms.shape)
         # print("labels_nms", labels_in_image)
 
+        patches = []
+        for box in bounding_boxes:
+            box = box.detach().cpu().numpy()
+            x0, y0 = box[0], box[1]
+            w, h = box[2] - box[0], box[3] - box[1]
+            patches.append(image.crop((x0, y0, x0+w, y0+h)))
+
         # print cosine similarity between all pairs of bounding boxes torch
-        for emb, label, class_id in zip(embeddings_nms, labels_in_image, labels_nms):
-            feature_embeddings.append((emb, label, class_id))
+        for emb, label, class_id, patch in zip(embeddings_nms, labels_in_image, labels_nms, patches):
+            feature_embeddings.append((emb, label, class_id, patch))
 
     return feature_embeddings
