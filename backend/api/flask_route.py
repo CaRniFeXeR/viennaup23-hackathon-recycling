@@ -47,6 +47,7 @@ app = Flask(__name__)
 
 example_data = load_data_from_jsons()
 
+
 objects_array = []
 for img_name, point in example_data.items():
     img_obj = {

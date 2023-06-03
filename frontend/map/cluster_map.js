@@ -5,7 +5,7 @@ console.log("cluster_map.js")
 
 function genIcon(url, size, view_factor = 1.0) {
 
-    scale_factor = 0.2;
+    scale_factor = 0.1;
     var bottleIcon = L.icon({
         iconUrl: url,
         iconSize: [size[0] * scale_factor * view_factor, size[1] * scale_factor * view_factor], // size of the icon
@@ -145,4 +145,4 @@ function getLatestScans(n) {
 }
 
 
-getLatestScans(29)
+getLatestScans(10)
