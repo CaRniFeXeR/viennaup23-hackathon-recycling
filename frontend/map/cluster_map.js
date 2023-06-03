@@ -5,7 +5,7 @@ console.log("cluster_map.js")
 
 function getIcon(url, size) {
 
-    scale_factor = 0.3;
+    scale_factor = 0.2;
     var bottleIcon = L.icon({
         iconUrl: url,
         iconSize:   [size[0] * scale_factor, size[1] * scale_factor], // size of the icon
@@ -26,7 +26,7 @@ var map = L.map('map', {
     });
 
 var bounds = [[-26.5,-25], [1021.5,1023]];
-var markers = [];
+var objs = [];
 // var image = L.imageOverlay('./static_content/background.png', bounds).addTo(map);
 
   // Attach the 'zoomend' event to the map
@@ -36,7 +36,8 @@ map.on('zoomend', function () {
 
     //for each marker in markers
     //update the icon size
-    markers.forEach(function(marker) {
+    objs.forEach(function(scan_obj) {
+        var marker = scan_obj.marker;
          // Calculate the new size of the icon based on the current zoom level
         var iconSize =  marker.getIcon().options.init_iconSize // Default size
 
@@ -58,32 +59,43 @@ map.on('zoomend', function () {
    
 });
 
-function addPoint(scan_obj) {
-    // Create a custom popup content
+function getPopupContent(scan_obj) {
     var popupContent = `
-    <div class="custom-popup">
+    <div class="custom-popup" id="obj_${scan_obj.id}">
         <img src="${scan_obj.img_url}" alt="Image">
-        <p>the object is labeled as '${scan_obj.predicted_class}'</p>
-        <input type="text" placeholder="assign a label for">
-        <button onclick="submitForm()">Save</button>
+        <p>the object is labeled as <b>${scan_obj.predicted_class}</b></p>
+        <input type="text" placeholder="type a new label" value="${scan_obj.predicted_class}">
+        <button onclick="submitForm(${scan_obj.id})">Save</button>
     </div>
     `;
+
+    return popupContent;
+}
+
+
+function addPoint(scan_obj) {
+    // Create a custom popup content
+    var popupContent = getPopupContent(scan_obj);
 
     var sol = L.latLng(scan_obj.point);
     var marker = L.marker(sol, {icon:getIcon(scan_obj.img_url, scan_obj.img_size)}).addTo(map).bindPopup(popupContent);
     map.setView( [70, 120], 1);
-    markers.push(marker);
+    scan_obj.marker = marker;
+    objs.push(scan_obj);
 
    
 }
 
  // Custom JavaScript function for submitting the form
- function submitForm() {
-    var userInput = document.querySelector('.custom-popup input[type="text"]').value;
+ function submitForm(id) {
+    var userInput = document.querySelector('#obj_' + id + ' input[type="text"]').value;
     alert('You entered: ' + userInput);
+    objs[id].predicted_class = userInput;
+
+    objs[id].marker.getPopup().setContent(getPopupContent(objs[id]));
 }
 
 
 
-addPoint({'img_url' :"./static_content/bottle1.png", "point": [ 145, 175.2 ], "predicted_class" : "plastic", "img_size" : [245, 355]})
-addPoint({'img_url' :"./static_content/bottle1.png", "point": [ 120, 22 ], "predicted_class" : "plastic", "img_size" : [245, 355]})
+addPoint({'id' : 0, 'img_url' :"./static_content/bottle1.png", "point": [ 145, 175.2 ], "predicted_class" : "plastic", "img_size" : [245, 355]})
+addPoint({'id' : 1, 'img_url' :"./static_content/bottle1.png", "point": [ 120, 22 ], "predicted_class" : "", "img_size" : [245, 355]})
