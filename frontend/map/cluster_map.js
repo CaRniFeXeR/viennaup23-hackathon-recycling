@@ -53,10 +53,7 @@ map.on('zoomend', function() {
         }
 
         // Update the icon size of the marker
-        marker.setIcon(L.icon({
-            iconUrl: scan_obj.img_url,
-            iconSize: iconSize
-        }));
+        marker.setIcon(getIcon(scan_obj.img_url, iconSize));
     });
 
 
