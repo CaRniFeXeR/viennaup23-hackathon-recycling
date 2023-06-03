@@ -27,10 +27,10 @@ var map = L.map('map', {
 
 var bounds = [
     [-26.5, -25],
-    [1021.5, 1023]
+    [1200, 1920]
 ];
 var objs = [];
-var image = L.imageOverlay('./static_content/background.png', bounds).addTo(map);
+var image = L.imageOverlay('./static_content/peakpx.jpg', bounds).addTo(map);
 
 // Attach the 'zoomend' event to the map
 map.on('zoomend', function() {
