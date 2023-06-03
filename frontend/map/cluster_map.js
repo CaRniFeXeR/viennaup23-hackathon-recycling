@@ -30,7 +30,7 @@ var bounds = [
     [1021.5, 1023]
 ];
 var objs = [];
-// var image = L.imageOverlay('./static_content/background.png', bounds).addTo(map);
+var image = L.imageOverlay('./static_content/background.png', bounds).addTo(map);
 
 // Attach the 'zoomend' event to the map
 map.on('zoomend', function() {
@@ -43,6 +43,7 @@ map.on('zoomend', function() {
         var marker = scan_obj.marker;
         // Calculate the new size of the icon based on the current zoom level
         var iconSize = marker.getIcon().options.init_iconSize // Default size
+        var factor = 1.0
 
         if (currentZoom < 0) {
             factor = 10 / (10 + currentZoom);
