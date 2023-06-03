@@ -19,8 +19,19 @@ var map = L.map('map', {
 var bounds = [[-26.5,-25], [1021.5,1023]];
 // var image = L.imageOverlay('./static_content/background.png', bounds).addTo(map);
 
+
+// Create a custom popup content
+var popupContent = `
+<div class="custom-popup">
+    <img src="./static_content/bottle1.png" alt="Image">
+    <p>Some text goes here...</p>
+    <input type="text" placeholder="Enter your text">
+    <button onclick="submitForm()">Submit</button>
+</div>
+`;
+
 var sol = L.latLng([ 145, 175.2 ]);
-var marker = L.marker(sol, {icon:bottleIcon}).addTo(map);
+var marker = L.marker(sol, {icon:bottleIcon}).addTo(map).bindPopup(popupContent);
 map.setView( [70, 120], 1);
 
 // Attach the 'zoomend' event to the map
@@ -56,3 +67,10 @@ map.on('zoomend', function () {
         iconSize: iconSize
     }));
 });
+
+
+ // Custom JavaScript function for submitting the form
+ function submitForm() {
+    var userInput = document.querySelector('.custom-popup input[type="text"]').value;
+    alert('You entered: ' + userInput);
+}
