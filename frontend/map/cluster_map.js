@@ -145,8 +145,4 @@ function getLatestScans(n) {
 }
 
 
-getLatestScans(3)
-
-
-// addPoint({ 'id': 0, 'img_url': "./static_content/bottle1.png", "point": [145, 175.2], "predicted_class": "plastic", "img_size": [245, 355] })
-// addPoint({ 'id': 1, 'img_url': "./static_content/bottle1.png", "point": [120, 22], "predicted_class": "", "img_size": [245, 355] })
+getLatestScans(29)
