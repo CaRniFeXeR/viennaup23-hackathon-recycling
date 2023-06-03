@@ -30,7 +30,9 @@ var bounds = [
     [1200, 1920]
 ];
 var objs = [];
-var image = L.imageOverlay('./static_content/peakpx.jpg', bounds).addTo(map);
+// var image = L.imageOverlay('./static_content/peakpx.jpg', bounds).addTo(map);
+
+
 
 // Attach the 'zoomend' event to the map
 map.on('zoomend', function() {
