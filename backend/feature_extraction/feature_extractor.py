@@ -1,7 +1,9 @@
 import glob
 import os
+import random
 from pathlib import Path
 from typing import List, Optional, Union
+import PIL.Image as PILImage
 from PIL import Image
 import timm
 import torch
@@ -37,6 +39,12 @@ class FeatureExtractor(nn.Module):
         self.device = device
         self.resize = transforms.Resize(size=(256, 256), interpolation=transforms.InterpolationMode.NEAREST)
         self.to_tensor = transforms.ToTensor()
+        self.transform_list = [
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomVerticalFlip(),
+            transforms.RandomAffine(degrees=(30, 210), translate=(0.1, 0.3), scale=(0.5, 0.75))
+            # Add more transformations to the set if desired
+        ]
         if img_path:
             self.load_imgs(img_path)
             self._fit_pca()
@@ -70,6 +78,18 @@ class FeatureExtractor(nn.Module):
         if len(features.shape) == 1:
             features = features.unsqueeze(dim=0)
         return features
+
+    def extract_feature(self, img: Union[Image.Image, torch.Tensor], augment: bool = True) -> torch.Tensor:
+        img = self.to_tensor(img)
+        if augment:
+            for transform in self.transform_list:
+                if random.random() < 0.5:
+                    img = transform(img)
+        if len(img.shape) == 3:
+            img = img.unsqueeze(dim=0)
+        return self.extractor(img)
+
+        # accept pil image + select a random affine transformation
 
     def _extract_features(self, x: torch.Tensor) -> torch.tensor:
         x = x.to(self.device)
@@ -107,9 +127,11 @@ def get_feature_extractor(img_path: Optional[Union[str, os.PathLike]] = None,
 
 
 if __name__ == '__main__':
-# one npy file per feature
-    img_path = os.environ.get('INPUT_PATH', '/home/alireza/repositories/viennaup23-hackathon-recycling/backend/data/images')
-    feature_path = Path(os.environ.get('OUTPUT_PATH', '/home/alireza/repositories/viennaup23-hackathon-recycling/backend/data/features_noclip64'))
+    # one npy file per feature
+    img_path = os.environ.get('INPUT_PATH',
+                              '/home/alireza/repositories/viennaup23-hackathon-recycling/backend/data/images')
+    feature_path = Path(os.environ.get('OUTPUT_PATH',
+                                       '/home/alireza/repositories/viennaup23-hackathon-recycling/backend/data/features_noclip64'))
     pca_proj = bool(os.environ.get('PCA_PROJ', False))
     mkdir(feature_path)
     file_list = glob.glob(f'{img_path}/*.*')
@@ -120,6 +142,3 @@ if __name__ == '__main__':
         features = m.pca_project(features)
     for idx, feature_vec in enumerate(features):
         np.save(feature_path / Path(file_list[idx]).stem, feature_vec)
-
-
-
