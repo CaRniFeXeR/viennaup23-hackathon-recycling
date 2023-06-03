@@ -31,6 +31,7 @@ class FeatureExtractor(nn.Module):
         self.hdbscan = hdbscan.HDBSCAN(min_cluster_size=3, gen_min_span_tree=True)
         self.device = device
         self.resize = transforms.Resize(size=(256, 256), interpolation=transforms.InterpolationMode.NEAREST)
+        self.to_tensor = transforms.ToTensor()
         if img_path:
             self.load_imgs(img_path)
         else:
@@ -40,17 +41,25 @@ class FeatureExtractor(nn.Module):
     def load_imgs(self, img_path: Union[str, os.PathLike]):
         if os.path.isdir(img_path):
             files = glob.glob(f'{img_path}/*.*')
-            arr = np.array([np.array(self.resize(Image.open(fname))) for fname in files])
+            self.imgs = [self.to_tensor(Image.open(fname)).unsqueeze(dim=0) for fname in files]
+            # arr = np.array([np.array(self.resize(Image.open(fname))) for fname in files])
         else:
-            arr = np.array([np.array(self.resize(Image.open(img_path)))])
-        self.imgs = torch.tensor(np.transpose(arr, (0, 3, 1, 2)))
+            # arr = np.array([np.array(self.resize(Image.open(img_path)))])
+            self.imgs = [self.to_tensor(Image.open(img_path)).unsqueeze(dim=0)]
+        # self.imgs = torch.tensor(np.transpose(arr, (0, 3, 1, 2)))
 
     def _extract_features_preloaded(self) -> torch.tensor:
-        return self.extractor.forward_features(self.imgs)
+        features = []
+        for i in self.imgs:
+            features.append(self.extractor.head.global_pool(self.extractor.forward_features(i)))
+        features = torch.cat(features, dim=0).squeeze()
+        if len(features.shape) == 1:
+            features = features.unsqueeze(dim=0)
+        return features
 
     def _extract_features(self, x: torch.Tensor) -> torch.tensor:
         x = x.to(self.device)
-        return self.extractor.forward_features(x)
+        return self.extractor.head.global_pool(self.extractor.forward_features(x))
 
     @torch.inference_mode()
     def forward(self, x: Optional[torch.Tensor] = None) -> torch.Tensor:
@@ -60,7 +69,7 @@ class FeatureExtractor(nn.Module):
         """
         if x is None:
             assert self.imgs, "Preload images or pass torch tensor"
-            return self.m._extract_features_preloaded(x)
+            return self._extract_features_preloaded()
         return self._extract_features(x)
 
     @torch.inference_mode()
@@ -74,7 +83,7 @@ class FeatureExtractor(nn.Module):
 def get_feature_extractor(img_path: Optional[Union[str, os.PathLike]] = None,
                           device: Optional[str] = None,
                           extractor_name: str = 'convnext_base.clip_laion2b') -> FeatureExtractor:
-    extractor = timm.create_model(model_name=extractor_name, pretrained=True)
+    extractor = timm.create_model(model_name=extractor_name, pretrained=True, num_classes=0)
     device = device or 'cuda' if torch.cuda.is_available() else 'cpu'
     return FeatureExtractor(img_path=img_path,
                             extractor= extractor,
