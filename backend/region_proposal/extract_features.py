@@ -34,7 +34,7 @@ def show_box(box, ax):
     w, h = box[2] - box[0], box[3] - box[1]
     ax.add_patch(plt.Rectangle((x0, y0), w, h, edgecolor='green', facecolor=(0,0,0,0), lw=2))
 
-def get_features():
+def get_features(texts):
 
     processor = OwlViTProcessor.from_pretrained("google/owlvit-large-patch14")
     model = OwlViTForObjectDetection.from_pretrained("google/owlvit-large-patch14")
@@ -54,7 +54,6 @@ def get_features():
         # Load image
         image = Image.open(image_path).convert("RGB")
         #texts = [["object", "can", "bottle"]]
-        texts = [["object", "Can: Sealed cylindrical metal container", "Bottle: Narrow-necked liquid storage container"]]
         inputs = processor(text=texts, images=image, return_tensors="pt")
 
         n += 1
