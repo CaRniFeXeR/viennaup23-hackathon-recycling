@@ -16,7 +16,7 @@ In a sense, the pipeline becomes a domain-adaptive online learner but has a soli
 
 Example of the embedding space after the final MLP prediction:
 
-### ![embeddings](figures/embeddings.png)
+### ![embedding](figures/embedding.png)
 
 ## TechStack (All open source)
 
