@@ -89,12 +89,31 @@ function addPoint(scan_obj) {
 // Custom JavaScript function for submitting the form
 function submitForm(id) {
     var userInput = document.querySelector('#obj_' + id + ' input[type="text"]').value;
-    alert('You entered: ' + userInput);
+
+    var postData = {
+        id: id,
+        object_class: userInput
+    };
+
+    // Sende den POST-Request an den Backend-Endpunkt
+    fetch('/set_object_class', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(postData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data.message); // Optional: Verarbeite die Antwort vom Backend
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+
     objs[id].predicted_class = userInput;
 
     objs[id].marker.getPopup().setContent(getPopupContent(objs[id]));
-
-    //Do backend call which id and which label got set
 }
 
 function getLatestScans(n) {
@@ -109,6 +128,7 @@ function getLatestScans(n) {
             if (data.hasOwnProperty('scanned_objects')) {
                 const scannedObjects = data.scanned_objects;
                 scannedObjects.forEach(scanObj => {
+                    console.log(scanObj);
                     addPoint(scanObj);
                 });
             } else if (data.hasOwnProperty('error')) {
@@ -126,5 +146,5 @@ function getLatestScans(n) {
 getLatestScans(3)
 
 
-addPoint({ 'id': 0, 'img_url': "./static_content/bottle1.png", "point": [145, 175.2], "predicted_class": "plastic", "img_size": [245, 355] })
-addPoint({ 'id': 1, 'img_url': "./static_content/bottle1.png", "point": [120, 22], "predicted_class": "", "img_size": [245, 355] })
+// addPoint({ 'id': 0, 'img_url': "./static_content/bottle1.png", "point": [145, 175.2], "predicted_class": "plastic", "img_size": [245, 355] })
+// addPoint({ 'id': 1, 'img_url': "./static_content/bottle1.png", "point": [120, 22], "predicted_class": "", "img_size": [245, 355] })
