@@ -22,15 +22,15 @@ function genIcon(url, size, view_factor = 1.0) {
 
 var map = L.map('map', {
     crs: L.CRS.Simple,
-    minZoom: -5
+    minZoom: 0
 });
 
 var bounds = [
-    [-26.5, -25],
-    [1200, 1920]
+    [-2500, -2500],
+    [2500, 2500]
 ];
 var objs = [];
-// var image = L.imageOverlay('./static_content/peakpx.jpg', bounds).addTo(map);
+var image = L.imageOverlay('./static_content/grid.png', bounds).addTo(map);
 
 
 
