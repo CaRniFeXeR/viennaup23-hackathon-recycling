@@ -65,7 +65,7 @@ map.on('zoomend', function() {
 function getPopupContent(scan_obj) {
     var popupContent = `
     <div class="custom-popup" id="obj_${scan_obj.id}">
-        <img src="${scan_obj.img_url}" alt="Image">
+        <img src="${scan_obj.img_url}" alt="Image" style="max-width: 100%; max-height: 100%;">
         <p>the object is labeled as <b>${scan_obj.predicted_class}</b></p>
         <input type="text" placeholder="type a new label" value="${scan_obj.predicted_class}">
         <button onclick="submitForm(${scan_obj.id})">Save</button>
@@ -124,7 +124,7 @@ function getLatestScans(n) {
 }
 
 
-getLatestScans(10)
+getLatestScans(3)
 
 
 addPoint({ 'id': 0, 'img_url': "./static_content/bottle1.png", "point": [145, 175.2], "predicted_class": "plastic", "img_size": [245, 355] })
