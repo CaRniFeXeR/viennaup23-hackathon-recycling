@@ -26,6 +26,19 @@ Example of the embedding space after the final MLP prediction:
 - Huggingface
 - PyTorch
 
+## Run Demo
+
+1. install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+2. run flask backend
+
+```bash
+python ./backend/flask_route.py
+```
+
 ## References
 
 - Wightman, R., PyTorch image models (2019). *DOI: https://doi. org/10.5281/zenodo*, *4414861*.
